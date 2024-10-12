@@ -4,7 +4,7 @@ from scipy.stats import norm
 import numpy as np
 from scipy.optimize import curve_fit
 
-data = np.loadtxt("DataR_run_black_02.csv", delimiter=",")
+data = np.loadtxt("LYSO.csv", delimiter=",")
 # print(data)
 # first_row = data[0]
 # add = data[0] + data[1]
@@ -26,12 +26,12 @@ def exp_model(x, A, tau):
     return A * np.exp(-x / tau)
 
 # Select the data range from x = 162 to x = 620
-x_fit_range = np.logical_and(x_values >= 200, x_values <= 1000)
+x_fit_range = np.logical_and(x_values >= 600, x_values <= 800)
 x_fit = x_values[x_fit_range]
 y_fit = average_waveform[x_fit_range]
 
 # Perform curve fitting
-popt, pcov = curve_fit(exp_model, x_fit, y_fit, p0=(3000, 40))  # Initial guess for A and tau
+popt, pcov = curve_fit(exp_model, x_fit, y_fit, p0=(2200, 100))  # Initial guess for A and tau
 
 # Extract fitted parameters
 A_fitted, tau_fitted = popt

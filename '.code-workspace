@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "Images",
+			"path": "../../Intermediate Physics Lab/Images"
+		},
+		{
+			"name": "Datasets",
+			"path": "../../Intermediate Physics Lab/Datasets"
+		},
+		{
+			"name": "Crystal-Scintillation-",
+			"path": "."
+		}
+	],
+	"settings": {}
+}

@@ -4,17 +4,16 @@ from scipy.optimize import curve_fit
 from scipy.integrate import quad
 
 # Load the data
-lyso = "Datasets/DataR_run_black_02.csv"
+lyso = "LYSO.csv"
 bgo = "Datasets/DataR_run_green_02.csv"
 csti = "Datasets/DataR_white_02.csv"
 csti_1 = 170000
 csti_2 = 210000
 bgo_1 = 120000
 bgo_2 = 180000
-lyso_1 = 40000
-lyso_2 = 60000
-
-lyso_g = 10
+lyso_1 = 8000
+lyso_2 = 9500
+lyso_g = 20
 bgo_g = 32
 csti_g = 20
 
@@ -23,8 +22,8 @@ def gaussian(x, amp, mean, stddev):
     return amp * np.exp(-((x - mean) ** 2) / (2 * stddev ** 2))
 
 # Load the data
-data = np.loadtxt(bgo, delimiter=",")
-data = data * (10 ** (-bgo_g / 20))
+data = np.loadtxt(lyso, delimiter=",")
+data = data * (10 ** (-lyso_g / 20))
 
 # Calculate the baseline
 baseline = np.average(data[:, :15], axis=1)
@@ -36,8 +35,8 @@ hist_values, bin_edges = np.histogram(np.sum(np.expand_dims(baseline, axis=1) - 
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
 # Define the range of ADC units for fitting (adjust as needed)
-x_min = bgo_1  # Adjust based on your peak
-x_max = bgo_2
+x_min = lyso_1  # Adjust based on your peak
+x_max = lyso_2
 
 # Select the data within the specified range
 mask = (bin_centers >= x_min) & (bin_centers <= x_max)
