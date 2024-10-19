@@ -7,10 +7,10 @@ from scipy.integrate import quad
 lyso = "LYSO.csv"
 bgo = "Datasets/DataR_run_green_02.csv"
 csti = "Datasets/DataR_white_02.csv"
-csti_1 = 170000
-csti_2 = 210000
-bgo_1 = 120000
-bgo_2 = 180000
+csti_1 = 13000
+csti_2 = 17000
+bgo_1 = 3500
+bgo_2 = 4200
 lyso_1 = 8000
 lyso_2 = 9500
 lyso_g = 20
@@ -22,8 +22,8 @@ def gaussian(x, amp, mean, stddev):
     return amp * np.exp(-((x - mean) ** 2) / (2 * stddev ** 2))
 
 # Load the data
-data = np.loadtxt(lyso, delimiter=",")
-data = data * (10 ** (-lyso_g / 20))
+data = np.loadtxt(bgo, delimiter=",")
+data = data * (10 ** (-csti_g / 20))
 
 # Calculate the baseline
 baseline = np.average(data[:, :15], axis=1)
@@ -34,14 +34,46 @@ hist_values, bin_edges = np.histogram(np.sum(np.expand_dims(baseline, axis=1) - 
 # Get the bin centers
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
+# Plot the full histogram to visualize the data
+plt.figure(figsize=(10, 6))
+plt.hist(np.sum(np.expand_dims(baseline, axis=1) - data, axis=1), bins=100, edgecolor='black', alpha=0.6, label="Full Histogram")
+plt.title('Full Histogram of BGO Data')
+plt.xlabel('ADC Units per Channel')
+plt.ylabel('Count')
+plt.grid(True)
+plt.show()
+
 # Define the range of ADC units for fitting (adjust as needed)
-x_min = lyso_1  # Adjust based on your peak
-x_max = lyso_2
+x_min = csti_1  # Adjust based on your peak
+x_max = csti_2
 
 # Select the data within the specified range
 mask = (bin_centers >= x_min) & (bin_centers <= x_max)
 x_data = bin_centers[mask]
 y_data = hist_values[mask]
+
+# Debugging output to check the data
+print(f"x_data: {x_data}")
+print(f"y_data: {y_data}")
+print(f"Initial guess: {np.max(y_data), np.mean(x_data), np.std(x_data)}")
+
+# Check for NaNs and remove them
+mask_nonan = ~np.isnan(x_data) & ~np.isnan(y_data)
+x_data = x_data[mask_nonan]
+y_data = y_data[mask_nonan]
+
+# Ensure there is enough data for curve fitting
+if len(x_data) > 3:
+    # Fit the Gaussian curve to the specified section
+    popt, _ = curve_fit(gaussian, x_data, y_data, p0=[np.max(y_data), np.mean(x_data), np.std(x_data)])
+
+    # Extract the fitted parameters
+    amp, mean, stddev = popt
+
+    # Print the Gaussian equation with the fitted parameters
+    print(f"Fitted Gaussian equation: f(x) = {amp:.2f} * exp(-((x - {mean:.2f})^2) / (2 * {stddev:.2f}^2))")
+else:
+    print("Not enough data points for curve fitting.")
 
 # Fit the Gaussian curve to the specified section
 popt, _ = curve_fit(gaussian, x_data, y_data, p0=[np.max(y_data), np.mean(x_data), np.std(x_data)])
@@ -82,3 +114,12 @@ plt.ylabel('Count')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+# Define the energy of Cs-137 gamma rays
+cs137_energy_keV = 662  # keV
+
+# Calculate the light yield in ADC units per keV
+light_yield_per_keV = mean / cs137_energy_keV
+
+# Print the light yield
+print(f"Light yield: {light_yield_per_keV:.2f} ADC units per keV")

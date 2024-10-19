@@ -4,7 +4,7 @@ from scipy.stats import norm
 import numpy as np
 from scipy.optimize import curve_fit
 #C:\Users\micha\OneDrive\2 School\Crystal Scintillation\Crystal-Scintillation-\Images
-data = np.loadtxt("Datasets/DataR_run_green_02.csv", delimiter=",")
+data = np.loadtxt("Datasets/DataR_run_white.csv", delimiter=",")
 # print(data)
 # first_row = data[0]
 # add = data[0] + data[1]
@@ -26,7 +26,7 @@ def exp_model(x, A, tau):
     return A * np.exp(-x / tau)
 
 # Select the data range from x = 162 to x = 620
-x_fit_range = np.logical_and(x_values >= 600, x_values <= 950)
+x_fit_range = np.logical_and(x_values >= 1000, x_values <= 1750)
 x_fit = x_values[x_fit_range]
 y_fit = average_waveform[x_fit_range]
 
